@@ -1,7 +1,7 @@
 from databases import Database
 
 
-DATABASE_URL = "sqlite:///./fastnote.db"
+DATABASE_URL = "sqlite+aiosqlite:///./fastnote.db"
 database = Database(DATABASE_URL)
 
 
