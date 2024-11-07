@@ -3,6 +3,10 @@ from databases import Database
 from pydantic import BaseModel
 
 
+class ClientNote(BaseModel):
+    content: Text
+
+
 class Note(BaseModel):
     id: int
     created_at: str
@@ -18,8 +22,20 @@ async def get_notes(db: Database) -> List[Note]:
 
     return notes
 
+
 async def get_note(db: Database, id: int) -> Note | None:
     row = await db.fetch_one("SELECT * FROM notes WHERE id=(:id)", {"id": id})
     if row == None:
         return None
+
     return Note(**dict(row))
+
+
+async def create_note(db: Database, client_note: ClientNote) -> Note | None:
+    id = await db.execute(
+        "INSERT INTO notes (content) VALUES (:content) RETURNING id",
+        { "content": client_note.content }
+    )
+
+    return await get_note(db, id)
+
