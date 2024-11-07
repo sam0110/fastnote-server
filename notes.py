@@ -18,3 +18,8 @@ async def get_notes(db: Database) -> List[Note]:
 
     return notes
 
+async def get_note(db: Database, id: int) -> Note | None:
+    row = await db.fetch_one("SELECT * FROM notes WHERE id=(:id)", {"id": id})
+    if row == None:
+        return None
+    return Note(**dict(row))

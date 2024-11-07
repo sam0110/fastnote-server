@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from database import database, init_database
-from notes import get_notes
+from notes import get_note, get_notes
 
 
 @asynccontextmanager
@@ -19,6 +19,12 @@ app = FastAPI(lifespan=lifespan)
 async def read_notes():
     notes = await get_notes(database)
     return notes
+
+
+@app.get("/note/{note_id}")
+async def read_note(note_id: int):
+    note = await get_note(database, note_id)
+    return note
 
 
 @app.get("/")
