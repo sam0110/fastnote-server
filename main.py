@@ -1,8 +1,8 @@
 from typing import List
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from contextlib import asynccontextmanager
 from database import database, init_database
-from notes import ClientNote, Note, create_note, get_note, get_notes
+import notes
 
 
 @asynccontextmanager
@@ -16,24 +16,25 @@ async def lifespan(_: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-@app.get("/notes", response_model=List[Note])
+@app.get("/notes", response_model=List[notes.Note])
 async def read_notes():
-    notes = await get_notes(database)
-    return notes
+    note_list = await notes.get_notes(database)
+    return note_list
 
 
-@app.get("/note/{note_id}", response_model=Note)
+@app.get("/note/{note_id}", response_model=notes.Note)
 async def read_note(note_id: int):
-    note = await get_note(database, note_id)
+    note = await notes.get_note(database, note_id)
     return note
 
 
-@app.post("/note", response_model=Note)
-async def post_note(client_note: ClientNote):
-    note = await create_note(database, client_note)
+@app.delete("/note/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_note(note_id: int):
+    await notes.delete_note(database, note_id)
+
+
+@app.post("/note", response_model=notes.Note)
+async def post_note(client_note: notes.ClientNote):
+    note = await notes.create_note(database, client_note)
     return note
 
-
-@app.get("/")
-async def read_root():
-    return {"Hello": "World"}
