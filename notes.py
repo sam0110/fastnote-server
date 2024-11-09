@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from typing import List, Optional, Text
 from databases import Database
 from pydantic import BaseModel
@@ -11,6 +12,7 @@ class ClientNote(BaseModel):
 class Note(BaseModel):
     id: int
     created_at: str
+    updated_at: str
     title: Text
     content: Text
 
@@ -34,8 +36,13 @@ async def get_note(db: Database, id: int) -> Optional[Note]:
 
 
 async def create_note(db: Database, client_note: ClientNote) -> Optional[Note]:
-    id = await db.execute(
-            "INSERT INTO notes (title, content) VALUES (:title, :content) RETURNING id", {
+    id = await db.execute("""
+INSERT INTO notes (created_at, updated_at, title, content)
+VALUES (:created_at, :updated_at, :title, :content)
+""",
+        {
+            "created_at": datetime.now(UTC),
+            "updated_at": datetime.now(UTC),
             "title": client_note.title,
             "content": client_note.content,
         },
