@@ -4,12 +4,14 @@ from pydantic import BaseModel
 
 
 class ClientNote(BaseModel):
+    title: Text
     content: Text
 
 
 class Note(BaseModel):
     id: int
     created_at: str
+    title: Text
     content: Text
 
 
@@ -33,8 +35,10 @@ async def get_note(db: Database, id: int) -> Note | None:
 
 async def create_note(db: Database, client_note: ClientNote) -> Note | None:
     id = await db.execute(
-        "INSERT INTO notes (content) VALUES (:content) RETURNING id",
-        { "content": client_note.content },
+            "INSERT INTO notes (title, content) VALUES (:title, :content) RETURNING id", {
+            "title": client_note.title,
+            "content": client_note.content,
+        },
     )
 
     return await get_note(db, id)

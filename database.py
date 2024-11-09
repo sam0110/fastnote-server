@@ -10,5 +10,6 @@ async def init_database(db: Database) -> None:
 CREATE TABLE IF NOT EXISTS notes(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at TEXT DEFAULT (strftime('%s', 'now')),
+    title TEXT DEFAULT "Untitled",
     content TEXT NOT NULL
 );""")
