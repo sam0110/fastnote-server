@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import FastAPI, status
 from contextlib import asynccontextmanager
+import categories
 from database import database, init_database
 import notes
 
@@ -42,4 +43,24 @@ async def update_note(note_id: int, client_note: notes.ClientNote):
 @app.delete("/note/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_note(note_id: int):
     await notes.delete_note(database, note_id)
+
+
+@app.post("/categories")
+async def create_category(category: categories.ClientCategory):
+    return await categories.create_category(database, category)
+
+
+@app.get("/categories")
+async def get_categories():
+    return await categories.get_categories(database)
+
+
+@app.get("/categories/{category_name}")
+async def get_category_notes(category_name: str):
+    return await categories.get_category_notes(database, category_name)
+
+
+@app.post("/categories/{category_id}/add-note", status_code=status.HTTP_204_NO_CONTENT)
+async def add_note_to_category(category_id: int, note: categories.ClientAddNote):
+    return await categories.add_note_to_category(database, category_id, note.note_id)
 
