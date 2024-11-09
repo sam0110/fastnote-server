@@ -34,6 +34,11 @@ async def get_note(note_id: int):
     return note
 
 
+@app.patch("/note/{note_id}", response_model=notes.Note)
+async def update_note(note_id: int, client_note: notes.ClientNote):
+    return await notes.update_note(database, note_id, client_note)
+
+
 @app.delete("/note/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_note(note_id: int):
     await notes.delete_note(database, note_id)

@@ -51,6 +51,22 @@ VALUES (:created_at, :updated_at, :title, :content)
     return await get_note(db, id)
 
 
+async def update_note(db: Database, id: int, client_note: ClientNote) -> Optional[Note]:
+    await db.execute("""
+UPDATE notes SET updated_at=:updated_at, title=:title, content=:content
+WHERE id=:id
+""",
+        {
+            "id": id,
+            "updated_at": datetime.now(UTC),
+            "title": client_note.title,
+            "content": client_note.content,
+        }
+    )
+
+    return await get_note(db, id)
+
+
 async def delete_note(db: Database, id: int) -> None:
     await db.execute(
         "DELETE FROM notes WHERE id=:id",
