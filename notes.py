@@ -1,4 +1,4 @@
-from typing import List, Text
+from typing import List, Optional, Text
 from databases import Database
 from pydantic import BaseModel
 
@@ -25,7 +25,7 @@ async def get_notes(db: Database) -> List[Note]:
     return notes
 
 
-async def get_note(db: Database, id: int) -> Note | None:
+async def get_note(db: Database, id: int) -> Optional[Note]:
     row = await db.fetch_one("SELECT * FROM notes WHERE id=:id", {"id": id})
     if row == None:
         return None
@@ -33,7 +33,7 @@ async def get_note(db: Database, id: int) -> Note | None:
     return Note(**dict(row))
 
 
-async def create_note(db: Database, client_note: ClientNote) -> Note | None:
+async def create_note(db: Database, client_note: ClientNote) -> Optional[Note]:
     id = await db.execute(
             "INSERT INTO notes (title, content) VALUES (:title, :content) RETURNING id", {
             "title": client_note.title,
